@@ -154,7 +154,7 @@ export class Fun extends plugin {
         logger.debug(`${e.logFnc}给${e.at}点赞`, res)
         if (res.code != 0) {
           if (res.code == 1) {
-            failsMsg = `${this.do}失败，请检查是否开启陌生人点赞或添加好友`
+            failsMsg = `${this.do}失败，请检查是否开启陌生人点赞`
           } else {
             if (this.do == `超`) {
               failsMsg = res.msg.replace(/给/g, '超').replace(/点/g, '').replace(/个赞/g, '下')
@@ -167,7 +167,7 @@ export class Fun extends plugin {
           n += 10
         }
       }
-      let successMsg = `给${e.at}${this.do}了${n}下哦，记得回我~ ${isFriend ? `` : `(如${this.do}失败请添加好友)`}`
+      let successMsg = `给${e.at}${this.do}了${n}下哦，记得回我~ `
       const avatar = `https://q1.qlogo.cn/g?b=qq&s=100&nk=${e.at}`
       const successFn = _.sample(['ganyu', 'zan'])
 
@@ -185,7 +185,7 @@ export class Fun extends plugin {
         ]
 
       /** 回复 */
-      e.reply(msg, true, { at: e.at })
+      e.reply(msg, false, { at: e.at })
     } else if (!e.msg.includes(`他`, `她`, `它`, `TA`, `ta`, `Ta`)) {
       /** 判断是否为好友 */
       let isFriend = await (e.bot ?? Bot).fl.get(e.user_id)
@@ -206,7 +206,7 @@ export class Fun extends plugin {
         logger.debug(`${e.logFnc}给${e.user_id}点赞`, res)
         if (res.code != 0) {
           if (res.code == 1) {
-            failsMsg = `${this.do}失败，请检查是否开启陌生人点赞或添加好友`
+            failsMsg = `${this.do}失败，请检查是否开启陌生人点赞`
           } else {
             if (this.do == `超`) {
               failsMsg = res.msg.replace(/给/g, '超').replace(/点/g, '').replace(/个赞/g, '下')
@@ -219,7 +219,7 @@ export class Fun extends plugin {
           n += 10
         }
       }
-      let successMsg = `给你${this.do}了${n}下哦，记得回我~ ${isFriend ? `` : `(如${this.do}失败请添加好友)`}`
+      let successMsg = `给你${this.do}了${n}下哦，记得回我~ `
       const avatar = `https://q1.qlogo.cn/g?b=qq&s=100&nk=${e.user_id}`
       const successFn = _.sample(['ganyu', 'zan'])
 
@@ -237,7 +237,7 @@ export class Fun extends plugin {
         ]
 
       /** 回复 */
-      e.reply(msg, true, { at: true })
+      e.reply(msg, false, { at: true })
     }
   }
 
