@@ -80,10 +80,6 @@ export class NewState extends plugin {
       State.getNodeInfo()
     ]))
     const defaultAvatar = `../../../../../plugins/${Plugin_Name}/resources/state/img/default_avatar.jpg`
-    // 发
-    const sent = await redis.get('Yz:count:sendMsg:total') || 0
-    // 图片
-    const screenshot = await redis.get('Yz:count:screenshot:total') || 0
     // 机器人名称
     const BotName = Version.name
     // 系统运行时间
@@ -91,7 +87,6 @@ export class NewState extends plugin {
     // 日历
     const calendar = moment().format('YYYY-MM-DD HH:mm:ss')
     // nodejs版本
-    const nodeVersion = process.version
     let BotStatus = ""
 
     /** bot列表 */
@@ -100,8 +95,8 @@ export class NewState extends plugin {
     if (e.msg.includes("pro") && Array.isArray(Bot?.uin)) {
       BotList = Bot.uin
     }
-    /** ws、qg、wx等多bot */
-    else if (!Array.isArray(Bot?.uin) && Bot?.adapter && Bot.adapter.includes(Bot.uin)) {
+    /** ws-plugin、Lain-plugin多bot */
+    else if (e.msg.includes("pro") && !Array.isArray(Bot?.uin) && Bot?.adapter && Bot?.adapter.includes(e.self_id)) {
       BotList = Bot.adapter
     }
 
@@ -116,12 +111,20 @@ export class NewState extends plugin {
       const onlineStatus = status[bot.status] || "在线"
       // 登录平台版本
       const platform = bot.apk ? `${bot.apk.display} v${bot.apk.version}` : bot.version.version || "未知"
+      // 发
+      const sent = await redis.get(`Yz:count:send:msg:bot:${bot.uin}:total`) || await redis.get('Yz:count:sendMsg:total') || 0
       // 收
-      const recv = bot.stat?.recv_msg_cnt || "未知"
+      const recv = await redis.get(`Yz:count:receive:msg:bot:${bot.uin}:total`) || bot.stat?.recv_msg_cnt || "未知"
+      // 图片
+      const screenshot = await redis.get(`Yz:count:send:image:bot:${bot.uin}:total`) || await redis.get('Yz:count:screenshot:total') || 0
       // 好友数
-      const friendQuantity = Array.from(bot.fl.values()).length
+      const friendQuantity = Array.from(bot.fl?.keys()).length
       // 群数
-      const groupQuantity = Array.from(bot.gl.values()).length
+      const groupQuantity = Array.from(bot.gl?.keys()).length
+      // 群员数
+      let groupMemberQuantity = 0
+      for (const i of bot.gml?.values() || [])
+        groupMemberQuantity += Array.from(i.keys()).length
       // 运行时间
       const runTime = common.formatTime(Date.now() / 1000 - bot.stat?.start_time, 'dd天hh小时mm分', false)
       // Bot版本
@@ -135,11 +138,10 @@ export class NewState extends plugin {
         <div class="header">
             <h1>${nickname}</h1>
             <hr noshade>
-            <p>${onlineStatus}(${platform}) | 收${recv} | 发${sent} | 图片${screenshot} | 好友${friendQuantity} |
-                群${groupQuantity}
-            </p>
+            <p>${onlineStatus}(${platform}) | ${botVersion}</p>
+            <p>收${recv} | 发${sent} | 图片${screenshot} | 好友${friendQuantity} | 群${groupQuantity} | 群员${groupMemberQuantity}</p>
             <p>${BotName} 已运行 ${runTime} | 系统运行 ${systime}</p>
-            <p>${calendar} | Nodejs ${nodeVersion} | ${botVersion}</p>
+            <p>${calendar} | Node.js ${process.version} | ${process.platform} ${process.arch}</p>
         </div>
     </div>
 </div>
